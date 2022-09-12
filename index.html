@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- wallet.exglos.com v0.0.0 -->
+<!-- wallet.exglos.com v0.1.0 -->
 <html lang="en">
     <head>
         <title>exglos web wallet</title>
@@ -33,28 +33,32 @@
             The one who knows the password, and only the one who knows the password,
             is the true owner of the funds.</p>
         <h2>enter account</h2>
-        <p>Testing in the ropsten testnet. Test account with test eth: testv4KgEjnSfv0MbUYNUc7tXacm93d88e.
+        <p>Testing in the goerli testnet. Test account with test eth: testv4KgEjnSfv0MbUYNUc7tXacm93d88e.
             Consider using tiny amounts.</p>
-        <input id="enterPassword" type="text" placeholder="enter password" />
-        <button id="enterOk">enter</button>
-        <p id="enterAddress"></p>
-        <p id="enterBalance"></p>
-        <p id="enterNonce"></p>
-        <p id="enterFee"></p>
-        <h2>send ether</h2>
-        <p>send ether to the address:</p>
-        <input id="sendTo" type="text" placeholder="enter address" />
-        <p>value to send:</p>
-        <input id="sendValue" type="text" placeholder="enter value, eth" />
+        <input id="accountPassword" type="text" placeholder="enter password" />
+        <button id="accountOk">enter</button>
+        <p id="accountAddress"></p>
         <p>nonce:</p>
-        <input id="sendNonce" type="text" placeholder="enter nonce" />
-        <p>max fee per gas:</p>
-        <input id="sendFee" type="text" placeholder="enter maxFeePerGas, gwei" />
-        <p>max priority fee per gas:</p>
-        <input id="sendPriority" type="text" placeholder="enter maxPriorityFeePerGas, gwei" />
-        <button id="sendOk">send</button>
-        <p id="sendTx"></p>
+        <input id="accountNonce" type="text" placeholder="enter nonce" />
+        <p>gas price:</p>
+        <input id="accountMaxGas" type="text" placeholder="enter maxFeePerGas, gwei" />
+        <h2>send ether</h2>
+        <p id="etherBalance"></p>
+        <p>send ether to the address:</p>
+        <input id="etherTo" type="text" placeholder="enter address" />
+        <p>value to send:</p>
+        <input id="etherValue" type="text" placeholder="enter value, eth" />
+        <button id="etherOk">send</button>
+        <h2>buy exglos</h2>
+        <p id="exgBalance"></p>
+        <input id="exgValue" type="text" placeholder="enter value, eth" />
+        <button id="exgBuy">buy</button>
+        <p id="exgDividends"></p>
+        <button id="exgWithdraw">withdraw</button>
+        <button id="exgReinvest">reinvest</button>
+        <h2>logs</h2>
+        <div id="logs"></div>
         <script src="ethers.js"></script>
-        <script src="index_0_0_0.js"></script>
+        <script src="index_0_1_0.js"></script>
     </body>
 </html>
