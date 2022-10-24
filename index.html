@@ -1,64 +1,135 @@
 <!DOCTYPE html>
-<!-- wallet.exglos.com v0.1.0 -->
+<!-- 1.0.0 -->
 <html lang="en">
     <head>
-        <title>exglos web wallet</title>
+        <title>exglos wallet</title>
 
         <meta charset="utf-8" />
-
         <meta name="description" content="ethereum web wallet" />
         <meta name="keywords" content="exglos post-hyip exg ethereum web wallet" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#EE0055" />
 
-        <link rel="icon" href="https://exglos.com/logo.png" />
-        <link rel="stylesheet" href="index_0_0_0.css" />
+        <link rel="icon" href="logo.png" />
+        <link rel="stylesheet" href="index_1_0_0.css" />
     </head>
     <body>
-        <h1>abstract</h1>
-        <p>Allow any internet user to access ethereum via a web browser without extra steps.
-            Use native blockchain design, but do not copy off-chain projects.
-            Show all stages of the
-            <a target="_blank" href="https://github.com/exglos/wallet">development process</a>
-            with intermediate results.</p>
-        <h2>create account</h2>
-        <p>Enter password, random symbols, label or nothing.
-            It will be expanded with random data and checksum.</p>
-        <input id="createUser" type="text" placeholder="enter anything" />
-        <button id="createOk">create</button>
-        <p id="createPassword"></p>
-        <p>This is your password. Keep it safe and backed up.
-            All you need to access your funds is this password.
-            There is no way to read, change or recover your password.
-            The one who knows the password, and only the one who knows the password,
-            is the true owner of the funds.</p>
-        <h2>enter account</h2>
-        <p>Testing in the goerli testnet. Test account with test eth: testv4KgEjnSfv0MbUYNUc7tXacm93d88e.
-            Consider using tiny amounts.</p>
-        <input id="accountPassword" type="text" placeholder="enter password" />
-        <button id="accountOk">enter</button>
-        <p id="accountAddress"></p>
-        <p>nonce:</p>
-        <input id="accountNonce" type="text" placeholder="enter nonce" />
-        <p>gas price:</p>
-        <input id="accountMaxGas" type="text" placeholder="enter maxFeePerGas, gwei" />
-        <h2>send ether</h2>
-        <p id="etherBalance"></p>
-        <p>send ether to the address:</p>
-        <input id="etherTo" type="text" placeholder="enter address" />
-        <p>value to send:</p>
-        <input id="etherValue" type="text" placeholder="enter value, eth" />
-        <button id="etherOk">send</button>
-        <h2>buy exglos</h2>
-        <p id="exgBalance"></p>
-        <input id="exgValue" type="text" placeholder="enter value, eth" />
-        <button id="exgBuy">buy</button>
-        <p id="exgDividends"></p>
-        <button id="exgWithdraw">withdraw</button>
-        <button id="exgReinvest">reinvest</button>
-        <h2>logs</h2>
-        <div id="logs"></div>
+        <div id="start">
+            <h1><a target="_blank" href="https://exglos.com">exglos</a>
+                <a target="_blank" href="https://github.com/exglos/wallet">wallet</a></h1>
+            <label>
+                <span id="startPasswordHint" class="hint"></span>
+                <input id="startPassword" type="password" placeholder="enter password" />
+            </label>
+            <button id="startOpen" class="button">open</button>
+            <button id="startCreate" class="button">create</button>
+        </div>
+        <div id="create">
+            <p>This is your password.</p>
+            <p id="createPassword"></p>
+            <p>Keep it safe and backed up.</p>
+            <p>All you need to access your funds is this password.</p>
+            <p>There is no way to read, change or recover your password.</p>
+            <p>The one who knows the password, and only the one who knows the password,
+                is the true owner of the funds.</p>
+            <button id="createOk" class="button">i got it</button>
+        </div>
+        <div id="main">
+            <h2 id="account">my exglos wallet</h2>
+            <p id="balance">loading...</p>
+            <div id="header">
+                <div class="right"><button id="headerExit">exit</button></div>
+                <div class="left"><button id="headerEther" class="active">ether</button></div>
+                <div class="left"><button id="headerErc20">erc20</button></div>
+                <div class="left"><button id="headerExglos">exglos</button></div>
+            </div>
+            <div id="ether">
+                <h3>send ether</h3>
+                <label>
+                    <span>recipient address</span>
+                    <span id="etherAddressHint" class="hint"></span>
+                    <input id="etherAddress" type="text" />
+                </label>
+                <label>
+                    <span>value to send, eth</span>
+                    <span id="etherValueHint" class="hint"></span>
+                    <input id="etherValue" type="text" />
+                </label>
+                <button id="etherSend" class="button">continue</button>
+            </div>
+            <div id="erc20">
+                <div id="erc20Select">
+                    <label>
+                        <span>erc20 contract</span>
+                        <span id="erc20ContractHint" class="hint"></span>
+                        <input id="erc20Contract" type="text" />
+                    </label>
+                    <button id="erc20Enter" class="button">enter</button>
+                    <div id="erc20List">
+                        <button id="erc200x3dDee7CdF8D71490b518b1E6e6f2198433636903">exglos</button>
+                        <button id="erc200xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2">weth</button>
+                    </div>
+                </div>
+                <div id="erc20Selected">
+                    <p id="erc20Name"></p>
+                    <button id="erc20Change" class="button">change</button>
+                    <p id="erc20Balance"></p>
+                    <label>
+                        <span>recipient address</span>
+                        <span id="erc20AddressHint" class="hint"></span>
+                        <input id="erc20Address" type="text" />
+                    </label>
+                    <label>
+                        <span id="erc20ValueSpan"></span>
+                        <span id="erc20ValueHint" class="hint"></span>
+                        <input id="erc20Value" type="text" />
+                    </label>
+                    <button id="erc20Send" class="button">continue</button>
+                </div>
+            </div>
+            <div id="exglos">
+                <p id="exglosBalance">loading...</p>
+                <div class="row">
+                    <div><label>
+                        <span>eth value</span>
+                        <input id="exglosEth" type="text" />
+                        </label></div>
+                    <div><label>
+                        <span>exg value</span>
+                        <input id="exglosExg" type="text" />
+                        </label></div>
+                </div>
+                <p id="exglosError"></p>
+                <button id="exglosBuy" class="button">buy</button>
+                <p id="exglosDivs"></p>
+                <div id="exglosButtons">
+                    <button id="exglosReinvest" class="button">reinvest</button>
+                    <button id="exglosWithdraw" class="button">withdraw</button>
+                </div>
+                <p id="exglosRef"></p>
+            </div>
+            <div id="logs"></div>
+        </div>
+        <div id="tx">
+            <h3 id="txDescription">tx</h3>
+            <label>
+                <span>nonce</span>
+                <input id="txNonce" type="number" />
+            </label>
+            <label>
+                <span>max gas price, gwei</span>
+                <input id="txPrice" type="text" />
+            </label>
+            <p id="txGas">loading gas...</p>
+            <p id="txBalance"></p>
+            <p id="txError"></p>
+            <div class="row">
+                <button id="txCancel" class="button">cancel</button>
+                <button id="txConfirm" class="button">confirm</button>
+            </div>
+        </div>
+        <div id="loading"><div></div></div>
         <script src="ethers.js"></script>
-        <script src="index_0_1_0.js"></script>
+        <script src="index_1_0_0.js"></script>
     </body>
 </html>
