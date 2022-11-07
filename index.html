@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 1.0.0 -->
+<!-- 1.1.0 -->
 <html lang="en">
     <head>
         <title>exglos wallet</title>
@@ -11,7 +11,7 @@
         <meta name="theme-color" content="#EE0055" />
 
         <link rel="icon" href="logo.png" />
-        <link rel="stylesheet" href="index_1_0_0.css" />
+        <link rel="stylesheet" href="index_1_1_0.css" />
     </head>
     <body>
         <div id="start">
@@ -42,6 +42,7 @@
                 <div class="left"><button id="headerEther" class="active">ether</button></div>
                 <div class="left"><button id="headerErc20">erc20</button></div>
                 <div class="left"><button id="headerExglos">exglos</button></div>
+                <div class="left"><button id="headerRss3">rss3</button></div>
             </div>
             <div id="ether">
                 <h3>send ether</h3>
@@ -108,6 +109,11 @@
                 </div>
                 <p id="exglosRef"></p>
             </div>
+            <div id="rss3">
+                <p id="rss3Header"></p>
+                <div id="rss3Txs">loading...</div>
+                <img src="assets/rss3.svg" alt="rss3" width="80" height="80" />
+            </div>
             <div id="logs"></div>
         </div>
         <div id="tx">
@@ -130,6 +136,6 @@
         </div>
         <div id="loading"><div></div></div>
         <script src="ethers.js"></script>
-        <script src="index_1_0_0.js"></script>
+        <script src="index_1_1_0.js"></script>
     </body>
 </html>

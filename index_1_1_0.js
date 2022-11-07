@@ -1,6 +1,6 @@
 'use strict';
 (function () {
-    var wallet, balance, erc20, exglos, txData;
+    var wallet, balance, erc20, exglos, rss3, txData;
 
     window.onbeforeunload = function () {
         return '';
@@ -34,6 +34,10 @@
         document.getElementById('headerExglos').onclick = function () {
             loadExglos();
             displayTab('exglos');
+        };
+        document.getElementById('headerRss3').onclick = function () {
+            loadRss3();
+            displayTab('rss3');
         };
         document.getElementById('etherAddress').onkeyup = function (event) {
             if (event.keyCode === 13) {
@@ -299,9 +303,11 @@
         document.getElementById('headerEther').className = tab === 'ether' ? 'active' : '';
         document.getElementById('headerErc20').className = tab === 'erc20' ? 'active' : '';
         document.getElementById('headerExglos').className = tab === 'exglos' ? 'active' : '';
+        document.getElementById('headerRss3').className = tab === 'rss3' ? 'active' : '';
         document.getElementById('ether').style.display = tab === 'ether' ? 'block' : 'none';
         document.getElementById('erc20').style.display = tab === 'erc20' ? 'block' : 'none';
         document.getElementById('exglos').style.display = tab === 'exglos' ? 'block' : 'none';
+        document.getElementById('rss3').style.display = tab === 'rss3' ? 'block' : 'none';
     }
 
     function loadBalance() {
@@ -712,6 +718,61 @@
             description: 'withdraw dividends'
         };
         continueTx();
+    }
+
+    function loadRss3() {
+        if (!rss3) {
+            if (wallet.provider.network.chainId !== 1) {
+                return document.getElementById('rss3Txs').innerHTML = 'not available in the testnet';
+            }
+            var a = document.createElement('a');
+            a.target = '_blank';
+            a.href = 'https://rss3.io/result?search=' + wallet.address;
+            a.innerHTML = 'view in rss3';
+            document.getElementById('rss3Header').appendChild(a);
+            rss3 = 'loading';
+            setInterval(loadRss3, 20000);
+        }
+
+        var url = 'https://pregod.rss3.dev/v1/notes/' + wallet.address + '?limit=100';
+        fetch(url).then(function (response) {
+            return response.json();
+        }).then(function (response) {
+            if (response.error) {
+                return document.getElementById('rss3Txs').innerHTML = response.error;
+            } else if (response.total === rss3.total) {
+                return;
+            }
+            rss3 = response;
+            var container = document.createElement('div');
+            for (var i = 0; i < rss3.total; i++) {
+                var tx = rss3.result[i];
+                if (!tx.success || tx.type !== 'transfer') {
+                    continue;
+                }
+                var div = document.createElement('div');
+                var p = document.createElement('p');
+                var date = new Date(tx.timestamp);
+                date = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+                p.innerHTML = date.substring(0, 10) + ' ' + date.substring(11, 19) +
+                    ' (fee ' + tx.fee + ')';
+                div.appendChild(p);
+                p = document.createElement('p');
+                var a = document.createElement('a');
+                a.target = '_blank';
+                a.href = explorer('tx/' + tx.hash);
+                a.innerHTML = tx.actions[0].metadata.value_display + ' to ' + tx.address_to;
+                p.appendChild(a);
+                div.appendChild(p);
+                container.appendChild(div);
+            }
+            if (container.childElementCount === 0) {
+                document.getElementById('rss3Txs').innerHTML = 'no outgoing transactions yet';
+            } else {
+                document.getElementById('rss3Txs').innerHTML = '';
+                document.getElementById('rss3Txs').appendChild(container);
+            }
+        }).catch(console.error);
     }
 
     function continueTx() {

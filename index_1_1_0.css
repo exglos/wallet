@@ -217,6 +217,27 @@ a:focus {
     min-height: 18px;
     text-align: center;
 }
+#rss3 {
+    display: none;
+}
+#rss3Header {
+    margin: 32px 8px 8px;
+    text-align: center;
+    font-size: 16px;
+}
+#rss3Txs {
+    margin-top: 16px;
+    text-align: center;
+}
+#rss3Txs div div {
+    margin: 16px auto 0px;
+    width: 90%;
+    text-align: left;
+}
+#rss3 img {
+    display: block;
+    margin: auto;
+}
 #logs {
     margin: 32px 0px 64px;
     border-top: 5px solid #EE0055;
