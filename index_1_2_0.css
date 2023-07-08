@@ -1,12 +1,17 @@
 /* color #EE0055 */
+
+@font-face {
+    font-family: main;
+    src: url(https://exglos.com/font.ttf);
+}
 html, body {
     margin: 0px;
     padding: 0px;
 }
-div, button, input {
+div, input, button {
+    font-family: main, monospace;
     overflow: hidden;
     word-wrap: break-word;
-    font-family: monospace;
 }
 label {
     display: block;
@@ -217,27 +222,6 @@ a:focus {
     min-height: 18px;
     text-align: center;
 }
-#rss3 {
-    display: none;
-}
-#rss3Header {
-    margin: 32px 8px 8px;
-    text-align: center;
-    font-size: 16px;
-}
-#rss3Txs {
-    margin-top: 16px;
-    text-align: center;
-}
-#rss3Txs div div {
-    margin: 16px auto 0px;
-    width: 90%;
-    text-align: left;
-}
-#rss3 img {
-    display: block;
-    margin: auto;
-}
 #logs {
     margin: 32px 0px 64px;
     border-top: 5px solid #EE0055;
@@ -299,7 +283,7 @@ a:focus {
     margin-top: 30vh;
     width: 160px;
     height: 160px;
-    background: url(logo.svg) center/contain no-repeat;
+    background: url(https://exglos.com/logo.svg) center/contain no-repeat;
     animation: image 3s 1.9s infinite;
 }
 
