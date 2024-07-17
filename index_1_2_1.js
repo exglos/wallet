@@ -247,7 +247,8 @@
             }
             try {
                 var provider = ethers.getDefaultProvider(parse('network'), {
-                    alchemy: 'm6nHD1aQAIbJHAYLnIMoBzMLOep-bLyC'
+                    alchemy: 'm6nHD1aQAIbJHAYLnIMoBzMLOep-bLyC',
+                    pocket: '-'
                 });
                 wallet = new ethers.Wallet(password, provider);
             } catch (error) {
@@ -610,7 +611,7 @@
             document.getElementById('exglosError').innerHTML = 'non-positive value';
             return;
         }
-        document.getElementById('exglosExg').value = ethers.utils.formatEther(eth.mul(1000).div(4));
+        document.getElementById('exglosExg').value = ethers.utils.formatEther(eth.mul(1000).div(8));
     }
 
     function setExglosEth() {
@@ -630,7 +631,7 @@
             document.getElementById('exglosError').innerHTML = 'non-positive value';
             return;
         }
-        document.getElementById('exglosEth').value = ethers.utils.formatEther(exg.mul(4).div(1000));
+        document.getElementById('exglosEth').value = ethers.utils.formatEther(exg.mul(8).div(1000));
     }
 
     function exglosBuy() {
