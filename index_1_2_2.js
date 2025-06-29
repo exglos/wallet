@@ -611,7 +611,7 @@
             document.getElementById('exglosError').innerHTML = 'non-positive value';
             return;
         }
-        document.getElementById('exglosExg').value = ethers.utils.formatEther(eth.mul(1000).div(8));
+        document.getElementById('exglosExg').value = ethers.utils.formatEther(eth.mul(1000).div(16));
     }
 
     function setExglosEth() {
@@ -631,7 +631,7 @@
             document.getElementById('exglosError').innerHTML = 'non-positive value';
             return;
         }
-        document.getElementById('exglosEth').value = ethers.utils.formatEther(exg.mul(8).div(1000));
+        document.getElementById('exglosEth').value = ethers.utils.formatEther(exg.mul(16).div(1000));
     }
 
     function exglosBuy() {
