@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 1.2.2 -->
+<!-- 1.2.3 -->
 <html lang="en">
     <head>
         <title>exglos wallet</title>
@@ -11,7 +11,11 @@
         <meta name="theme-color" content="#EE0055" />
 
         <link rel="icon" href="https://exglos.com/logo.png" />
-        <link rel="stylesheet" href="index_1_2_2.css" />
+        <link rel="stylesheet" href="index_1_2_3.css" />
+        <script type="module">
+            import { ethers } from "./ethers.min.js";
+            window.ethers = ethers;
+        </script>
     </head>
     <body>
         <div id="start">
@@ -129,7 +133,6 @@
             </div>
         </div>
         <div id="loading"><div></div></div>
-        <script src="ethers.js"></script>
-        <script src="index_1_2_2.js"></script>
+        <script src="index_1_2_3.js"></script>
     </body>
 </html>

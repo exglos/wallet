@@ -173,10 +173,10 @@
     function create() {
         startLoading();
         setTimeout(function () {
-            var entropy = ethers.BigNumber.from(ethers.utils.sha256(ethers.utils.randomBytes(40)));
+            var entropy = BigInt(ethers.sha256(ethers.randomBytes(40)));
             var random = parse('random');
             if (random) {
-                entropy = entropy.add(ethers.BigNumber.from(ethers.utils.id(random)));
+                entropy += BigInt(ethers.id(random));
             }
 
             var base62 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -188,10 +188,10 @@
                 length = 46;
             }
             for (var i = 0; i < length; i++) {
-                password += base62.charAt(entropy.mod(62).toNumber());
-                entropy = entropy.div(62);
+                password += base62.charAt(Number(entropy % 62n));
+                entropy /= 62n;
             }
-            password += ethers.utils.id(password).substr(2, 6);
+            password += ethers.id(password).substr(2, 6);
 
             document.getElementById('start').style.display = 'none';
             document.getElementById('startPasswordHint').innerHTML = '';
@@ -219,12 +219,12 @@
                 return stopLoading();
             }
             if (password.indexOf(' ') < 0) {
-                var checksum = ethers.utils.id(password.substr(0, password.length - 6)).substr(2, 6);
+                var checksum = ethers.id(password.substr(0, password.length - 6)).substr(2, 6);
                 if (checksum !== password.substr(password.length - 6)) {
                     document.getElementById('startPasswordHint').innerHTML = 'incorrect password';
                     return stopLoading();
                 }
-                password = ethers.utils.id(password);
+                password = ethers.id(password);
             } else {
                 var path = null;
                 if (password.match(/\d/)) {
@@ -235,7 +235,7 @@
                     }
                 }
                 try {
-                    password = ethers.Wallet.fromMnemonic(password, path).privateKey;
+                    password = ethers.HDNodeWallet.fromPhrase(password, null, path).privateKey;
                 } catch (error) {
                     console.error(error);
                     if (error.message) {
@@ -248,7 +248,7 @@
             try {
                 var provider = ethers.getDefaultProvider(parse('network'), {
                     alchemy: 'm6nHD1aQAIbJHAYLnIMoBzMLOep-bLyC',
-                    pocket: '-'
+                    infura: '-'
                 });
                 wallet = new ethers.Wallet(password, provider);
             } catch (error) {
@@ -258,7 +258,7 @@
             password = null;
 
             loadBalance();
-            wallet.provider.on('block', loadBalance);
+            setInterval(loadBalance, 30000);
 
             document.getElementById('startPassword').value = '';
             document.getElementById('start').style.display = 'none';
@@ -270,20 +270,20 @@
             a.innerHTML = wallet.address;
             document.getElementById('account').appendChild(a);
             var arg = parse('etherAddress');
-            if (arg && ethers.utils.isAddress(arg)) {
+            if (arg && ethers.isAddress(arg)) {
                 document.getElementById('etherAddress').value = arg;
             }
             arg = parse('etherValue');
             if (arg) {
                 try {
-                    if (ethers.utils.parseEther(arg).gt(0)) {
+                    if (ethers.parseEther(arg) > 0) {
                         document.getElementById('etherValue').value = arg;
                     }
                 } catch (error) {
                 }
             }
             arg = parse('erc20Contract');
-            if (arg && ethers.utils.isAddress(arg)) {
+            if (arg && ethers.isAddress(arg)) {
                 document.getElementById('erc20Contract').value = arg;
             }
             stopLoading();
@@ -306,21 +306,21 @@
     }
 
     function loadBalance() {
-        wallet.getBalance().then(function (result) {
+        wallet.provider.getBalance(wallet).then(function (result) {
             balance = result;
-            result = ethers.utils.formatEther(result) + ' eth';
+            result = ethers.formatEther(result) + ' eth';
             document.getElementById('balance').innerHTML = result;
         }).catch(console.error);
     }
 
     function etherSend() {
         startLoading();
-        if (!balance) {
+        if (balance === undefined) {
             return setTimeout(etherSend, 200);
         }
         document.getElementById('etherAddressHint').innerHTML = '';
         document.getElementById('etherValueHint').innerHTML = '';
-        if (balance.isZero()) {
+        if (balance === 0n) {
             document.getElementById('etherValueHint').innerHTML = 'zero balance';
             return stopLoading();
         }
@@ -329,7 +329,7 @@
             document.getElementById('etherAddressHint').innerHTML = 'enter address';
             document.getElementById('etherAddress').focus();
             return stopLoading();
-        } else if (!ethers.utils.isAddress(address)) {
+        } else if (!ethers.isAddress(address)) {
             document.getElementById('etherAddressHint').innerHTML = 'incorrect address';
             document.getElementById('etherAddress').focus();
             return stopLoading();
@@ -341,17 +341,17 @@
             return stopLoading();
         }
         try {
-            value = ethers.utils.parseEther(value);
+            value = ethers.parseEther(value);
         } catch (error) {
             document.getElementById('etherValueHint').innerHTML = 'incorrect number';
             document.getElementById('etherValue').focus();
             return stopLoading();
         }
-        if (value.lt(0)) {
+        if (value < 0n) {
             document.getElementById('etherValueHint').innerHTML = 'negative value';
             document.getElementById('etherValue').focus();
             return stopLoading();
-        } else if (value.gte(balance)) {
+        } else if (value > balance) {
             document.getElementById('etherValueHint').innerHTML = 'too big value';
             document.getElementById('etherValue').focus();
             return stopLoading();
@@ -359,7 +359,7 @@
 
         txData = {
             function: 'etherSend',
-            description: 'send ' + ethers.utils.formatEther(value) + ' eth to ' + address,
+            description: 'send ' + ethers.formatEther(value) + ' eth to ' + address,
             value: value,
             to: address
         };
@@ -384,7 +384,7 @@
             document.getElementById('erc20ContractHint').innerHTML = 'enter address';
             document.getElementById('erc20Contract').focus();
             return stopLoading();
-        } else if (!ethers.utils.isAddress(address)) {
+        } else if (!ethers.isAddress(address)) {
             document.getElementById('erc20ContractHint').innerHTML = 'incorrect address';
             document.getElementById('erc20Contract').focus();
             return stopLoading();
@@ -404,7 +404,7 @@
             wallet
         );
         loadingErc20.contract.decimals().then(function (result) {
-            loadingErc20.decimals = result;
+            loadingErc20.decimals = Number(result);
             load();
         }).catch(function (error) {
             console.error(error);
@@ -432,10 +432,10 @@
             load();
         }).catch(function (error) {
             console.error(error);
-            if (error.code === 'CALL_EXCEPTION') {
+            if (error.code === 'CALL_EXCEPTION' || error.code === 'BAD_DATA') {
                 error = 'not a erc20';
             } else {
-                error = error.reason;
+                error = error.message;
             }
             document.getElementById('erc20ContractHint').innerHTML = error;
             document.getElementById('erc20Contract').focus();
@@ -445,7 +445,7 @@
         function load() {
             if (!loadingErc20.decimals && loadingErc20.decimals !== 0) {
                 return;
-            } else if (!loadingErc20.name || !loadingErc20.symbol || !loadingErc20.balance) {
+            } else if (!loadingErc20.name || !loadingErc20.symbol || loadingErc20.balance === undefined) {
                 return;
             }
             erc20 = loadingErc20;
@@ -464,7 +464,7 @@
             a.innerHTML = erc20.name;
             document.getElementById('erc20Name').appendChild(a);
             document.getElementById('erc20Balance').innerHTML =
-                ethers.utils.formatUnits(erc20.balance, erc20.decimals) + ' ' + erc20.symbol;
+                ethers.formatUnits(erc20.balance, erc20.decimals) + ' ' + erc20.symbol;
             document.getElementById('erc20ValueSpan').innerHTML = 'value to send, ' + erc20.symbol;
             stopLoading();
         }
@@ -476,7 +476,7 @@
                 return;
             }
             erc20.balance = result;
-            result = ethers.utils.formatUnits(result, erc20.decimals) + ' ' + erc20.symbol;
+            result = ethers.formatUnits(result, erc20.decimals) + ' ' + erc20.symbol;
             document.getElementById('erc20Balance').innerHTML = result;
         }).catch(console.error);
     }
@@ -500,7 +500,7 @@
         startLoading();
         document.getElementById('erc20AddressHint').innerHTML = '';
         document.getElementById('erc20ValueHint').innerHTML = '';
-        if (balance.isZero()) {
+        if (balance === 0n) {
             document.getElementById('erc20ValueHint').innerHTML = 'zero balance';
             return stopLoading();
         }
@@ -509,7 +509,7 @@
             document.getElementById('erc20AddressHint').innerHTML = 'enter address';
             document.getElementById('erc20Address').focus();
             return stopLoading();
-        } else if (!ethers.utils.isAddress(address)) {
+        } else if (!ethers.isAddress(address)) {
             document.getElementById('erc20AddressHint').innerHTML = 'incorrect address';
             document.getElementById('erc20Address').focus();
             return stopLoading();
@@ -521,23 +521,23 @@
             return stopLoading();
         }
         try {
-            value = ethers.utils.parseUnits(value, erc20.decimals);
+            value = ethers.parseUnits(value, erc20.decimals);
         } catch (error) {
             document.getElementById('erc20ValueHint').innerHTML = 'incorrect number';
             document.getElementById('erc20Value').focus();
             return stopLoading();
         }
-        if (value.lt(0)) {
+        if (value < 0n) {
             document.getElementById('erc20ValueHint').innerHTML = 'negative value';
             document.getElementById('erc20Value').focus();
             return stopLoading();
-        } else if (value.gt(erc20.balance)) {
+        } else if (value > erc20.balance) {
             document.getElementById('erc20ValueHint').innerHTML = 'too big value';
             document.getElementById('erc20Value').focus();
             return stopLoading();
         }
 
-        var description = 'send ' + ethers.utils.formatUnits(value, erc20.decimals) + ' ' +
+        var description = 'send ' + ethers.formatUnits(value, erc20.decimals) + ' ' +
             erc20.symbol + ' (' + erc20.name + ') to ' + address;
         txData = {
             function: 'erc20Send',
@@ -564,32 +564,22 @@
                 ],
                 wallet
             );
-            exglos.on('Profit', loadExglos);
-            exglos.on('Withdraw', function (holder, wei, event) {
-                if (holder === wallet.address) {
-                    loadExglos();
-                }
-            });
-            exglos.on('Transfer', function (from, to, exg, event) {
-                if (from === wallet.address || to === wallet.address) {
-                    loadExglos();
-                }
-            });
+            setInterval(loadExglos, 30000);
         }
 
         exglos.balanceOf(wallet.address).then(function (result) {
-            if (result.gte(1000000000)) {
+            if (result > 1000000000n) {
                 document.getElementById('exglosRef').innerHTML =
                     'ref link: wallet.exglos.com?ref=' + wallet.address;
             } else {
                 document.getElementById('exglosRef').innerHTML = '';
             }
-            result = ethers.utils.formatEther(result);
+            result = ethers.formatEther(result);
             document.getElementById('exglosBalance').innerHTML = result + ' exg';
         }).catch(console.error);
         exglos.dividendsOf(wallet.address).then(function (result) {
-            document.getElementById('exglosButtons').style.display = result.gt(1) ? 'block' : 'none';
-            result = ethers.utils.formatEther(result);
+            document.getElementById('exglosButtons').style.display = result > 1 ? 'block' : 'none';
+            result = ethers.formatEther(result);
             document.getElementById('exglosDivs').innerHTML = 'dividends ' + result + ' eth';
         }).catch(console.error);
     }
@@ -602,16 +592,16 @@
             return;
         }
         try {
-            eth = ethers.utils.parseEther(eth);
+            eth = ethers.parseEther(eth);
         } catch (error) {
             document.getElementById('exglosError').innerHTML = 'incorrect number';
             return;
         }
-        if (eth.lte(0)) {
+        if (eth < 0) {
             document.getElementById('exglosError').innerHTML = 'non-positive value';
             return;
         }
-        document.getElementById('exglosExg').value = ethers.utils.formatEther(eth.mul(1000).div(16));
+        document.getElementById('exglosExg').value = ethers.formatEther(eth * 1000n / 16n);
     }
 
     function setExglosEth() {
@@ -622,25 +612,25 @@
             return;
         }
         try {
-            exg = ethers.utils.parseEther(exg);
+            exg = ethers.parseEther(exg);
         } catch (error) {
             document.getElementById('exglosError').innerHTML = 'incorrect number';
             return;
         }
-        if (exg.lte(0)) {
+        if (exg < 0) {
             document.getElementById('exglosError').innerHTML = 'non-positive value';
             return;
         }
-        document.getElementById('exglosEth').value = ethers.utils.formatEther(exg.mul(16).div(1000));
+        document.getElementById('exglosEth').value = ethers.formatEther(exg * 16n / 1000n);
     }
 
     function exglosBuy() {
         startLoading();
-        if (!balance) {
+        if (balance === undefined) {
             return setTimeout(exglosBuy, 200);
         }
         document.getElementById('exglosError').innerHTML = '';
-        if (balance.isZero()) {
+        if (balance === 0n) {
             document.getElementById('exglosError').innerHTML = 'zero balance';
             return stopLoading();
         }
@@ -651,33 +641,33 @@
             return stopLoading();
         }
         try {
-            value = ethers.utils.parseEther(value);
+            value = ethers.parseEther(value);
         } catch (error) {
             document.getElementById('exglosEth').focus();
             document.getElementById('exglosError').innerHTML = 'incorrect number';
             return stopLoading();
         }
-        if (value.lt(0)) {
+        if (value < 0n) {
             document.getElementById('exglosEth').focus();
             document.getElementById('exglosError').innerHTML = 'negative value';
             return stopLoading();
-        } else if (value.gte(balance)) {
+        } else if (value > balance) {
             document.getElementById('exglosEth').focus();
             document.getElementById('exglosError').innerHTML = 'too big value';
             return stopLoading();
         }
 
         var description = 'buy ' + document.getElementById('exglosExg').value +
-            ' exg for ' + ethers.utils.formatEther(value) + ' eth';
+            ' exg for ' + ethers.formatEther(value) + ' eth';
         var ref = parse('ref');
         if (ref === 'no') {
-            ref = ethers.constants.AddressZero;
+            ref = ethers.ZeroAddress;
         } else if (ref === 'exglosnet') {
             ref = '0xC5E4045E291EE6a414beb298310fF41b86D53666';
         } else if (ref === 'hyipcheck') {
             ref = '0xE19299E010a3c7870019a9B0E958DD138284A044';
         }
-        if (!ethers.utils.isAddress(ref)) {
+        if (!ethers.isAddress(ref)) {
             ref = '0xE974e991668CDEAF98e03A2154363a8f20494909';
         }
         txData = {
@@ -721,7 +711,7 @@
         document.getElementById('txDescription').innerHTML = txData.description;
         stopLoading();
 
-        wallet.getTransactionCount().then(function (result) {
+        wallet.provider.getTransactionCount(wallet).then(function (result) {
             if (!txData) {
                 return;
             }
@@ -731,11 +721,11 @@
             }
         }).catch(console.error);
 
-        wallet.getFeeData().then(function (result) {
+        wallet.provider.getFeeData().then(function (result) {
             if (!txData) {
                 return;
             }
-            result = ethers.utils.formatUnits(result.maxFeePerGas, 9);
+            result = ethers.formatUnits(result.maxFeePerGas, 9);
             document.getElementById('txPrice').placeholder = result;
             if (document.getElementById('txPrice').value === '') {
                 document.getElementById('txPrice').value = result;
@@ -747,20 +737,20 @@
         if (txData.function === 'etherSend') {
             estimate = wallet.estimateGas({value: txData.value, to: txData.to});
         } else if (txData.function === 'erc20Send') {
-            estimate = erc20.contract.estimateGas.transfer(txData.to, txData.value);
+            estimate = erc20.contract.transfer.estimateGas(txData.to, txData.value);
         } else if (txData.function === 'exglosBuy') {
-            estimate = exglos.estimateGas.buy(txData.ref, {value: txData.value});
+            estimate = exglos.buy.estimateGas(txData.ref, {value: txData.value});
         } else if (txData.function === 'exglosReinvest') {
-            estimate = exglos.estimateGas.reinvest();
+            estimate = exglos.reinvest.estimateGas();
         } else if (txData.function === 'exglosWithdraw') {
-            estimate = exglos.estimateGas.withdraw();
+            estimate = exglos.withdraw.estimateGas();
         }
         estimate.then(function (result) {
             if (!txData) {
                 return;
             }
             txData.gasLimit = result;
-            document.getElementById('txGas').innerHTML = 'max gas ' + result;
+            document.getElementById('txGas').innerHTML = 'max gas ' + Number(result);
             calculateFee();
         }).catch(console.error);
     }
@@ -776,28 +766,28 @@
             return;
         }
         try {
-            price = ethers.utils.parseUnits(price, 9);
+            price = ethers.parseUnits(price, 9);
         } catch (error) {
             document.getElementById('txError').innerHTML = 'incorrect number';
             return;
         }
-        if (price.lte(0)) {
+        if (price < 0n) {
             document.getElementById('txError').innerHTML = 'non-positive value';
             return;
         }
-        var minus = price.mul(txData.gasLimit);
+        var minus = price * txData.gasLimit;
         if (txData.function === 'etherSend' || txData.function === 'exglosBuy') {
-            minus = minus.add(txData.value);
+            minus = minus + txData.value;
         }
-        if (minus.gte(balance)) {
+        if (minus > balance) {
             document.getElementById('txPrice').focus();
             document.getElementById('txError').innerHTML = 'too big value';
             return;
         }
         document.getElementById('txBalance').innerHTML =
-            ethers.utils.formatEther(balance) + '<br />- ' +
-            ethers.utils.formatEther(minus) + '<br />= ' +
-            ethers.utils.formatEther(balance.sub(minus)) + ' eth';
+            ethers.formatEther(balance) + '<br />- ' +
+            ethers.formatEther(minus) + '<br />= ' +
+            ethers.formatEther(balance - minus) + ' eth';
     }
 
     function txClose() {
@@ -833,14 +823,14 @@
         var maxFee = document.getElementById('txPrice').value;
         if (maxFee !== '') {
             try {
-                maxFee = ethers.utils.parseUnits(maxFee, 9);
+                maxFee = ethers.parseUnits(maxFee, 9);
             } catch (error) {
                 document.getElementById('txPrice').focus();
                 document.getElementById('txError').innerHTML = 'incorrect number';
                 return stopLoading();
             }
             tx.maxFeePerGas = maxFee;
-            tx.maxPriorityFeePerGas = maxFee.div(10);
+            tx.maxPriorityFeePerGas = maxFee / 10n;
         }
 
         if (prompt('print yes to confirm') !== 'yes') {
@@ -867,7 +857,7 @@
 
         request.then(function (response) {
             response.wait().then(function (receipt) {
-                var p = document.getElementById(receipt.transactionHash);
+                var p = document.getElementById(receipt.hash);
                 if (p) {
                     var span = document.createElement('span');
                     span.innerHTML = ' - confirmed';
@@ -943,10 +933,6 @@
     }
 
     function explorer(link) {
-        if (wallet.provider.network.chainId === 1) {
-            return 'https://etherscan.io/' + link;
-        } else {
-            return 'https://' + wallet.provider.network.name + '.etherscan.io/' + link;
-        }
+        return 'https://etherscan.io/' + link;
     }
 })();
