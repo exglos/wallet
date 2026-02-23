@@ -1,26 +1,25 @@
-<!DOCTYPE html>
-<!-- 1.2.3 -->
+<!doctype html>
+<!-- 2.0.0 -->
 <html lang="en">
     <head>
         <title>exglos wallet</title>
 
-        <meta charset="utf-8" />
-        <meta name="description" content="exglos ethereum web wallet" />
-        <meta name="keywords" content="exglos jo satoshi ethereum web wallet" />
+        <meta charset="UTF-8" />
+        <meta name="description" content="simple web ethereum wallet" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#EE0055" />
 
-        <link rel="icon" href="https://exglos.com/logo.png" />
-        <link rel="stylesheet" href="index_1_2_3.css" />
-        <script type="module">
-            import { ethers } from "./ethers.min.js";
-            window.ethers = ethers;
-        </script>
+        <link rel="icon" href="./logo.png" />
+        <link rel="stylesheet" href="./style-2.0.0.css" />
+        <script type="module" src="./app-2.0.0.js"></script>
     </head>
     <body>
+        <div id="loading"><div></div></div>
         <div id="start">
-            <h1><a target="_blank" href="https://exglos.com">exglos</a>
-                <a target="_blank" href="https://github.com/exglos/wallet">wallet</a></h1>
+            <h1>
+                <a target="_blank" href="https://exglos.com">exglos</a>
+                <a target="_blank" href="https://github.com/exglos/wallet">wallet</a>
+            </h1>
             <label>
                 <span id="startPasswordHint" class="hint"></span>
                 <input id="startPassword" type="password" placeholder="enter password" />
@@ -34,74 +33,85 @@
             <p>Keep it safe and backed up.</p>
             <p>All you need to access your funds is this password.</p>
             <p>There is no way to read, change or recover your password.</p>
-            <p>The one who knows the password, and only the one who knows the password,
-                is the true owner of the funds.</p>
+            <p>
+                The one who knows the password, and only the one who knows the password, is the true owner of the funds.
+            </p>
             <button id="createOk" class="button">i got it</button>
         </div>
         <div id="main">
-            <h2 id="account">my exglos wallet</h2>
-            <p id="balance">loading...</p>
             <div id="header">
-                <div class="right"><button id="headerExit">exit</button></div>
-                <div class="left"><button id="headerEther" class="active">ether</button></div>
-                <div class="left"><button id="headerErc20">erc20</button></div>
-                <div class="left"><button id="headerExglos">exglos</button></div>
+                <h2 id="headerAccount" class="address">exglos wallet</h2>
+                <p id="headerBalance">loading...</p>
+                <div id="headerMenu">
+                    <div><button id="headerEther">ether</button></div>
+                    <div><button id="headerTokens">tokens</button></div>
+                    <div><button id="headerExglos">exglos</button></div>
+                    <div><button id="headerPlus">+</button></div>
+                </div>
             </div>
             <div id="ether">
                 <h3>send ether</h3>
+                <p id="etherBalance">loading...</p>
                 <label>
                     <span>recipient address</span>
                     <span id="etherAddressHint" class="hint"></span>
-                    <input id="etherAddress" type="text" />
+                    <input id="etherAddress" class="address" type="text" />
                 </label>
                 <label>
                     <span>value to send, eth</span>
                     <span id="etherValueHint" class="hint"></span>
                     <input id="etherValue" type="text" />
                 </label>
-                <button id="etherSend" class="button">continue</button>
+                <button id="etherContinue" class="button">continue</button>
+                <div id="etherNewTxs" class="newTxs"></div>
             </div>
-            <div id="erc20">
-                <div id="erc20Select">
-                    <label>
-                        <span>erc20 contract</span>
-                        <span id="erc20ContractHint" class="hint"></span>
-                        <input id="erc20Contract" type="text" />
-                    </label>
-                    <button id="erc20Enter" class="button">enter</button>
-                    <div id="erc20List">
-                        <button id="erc200x3dDee7CdF8D71490b518b1E6e6f2198433636903">exglos</button>
-                        <button id="erc200xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2">weth</button>
-                    </div>
+            <div id="tokens">
+                <div id="tokensMenu">
+                    <div><button class="active" id="tokensMenu0">EXG</button></div>
+                    <div><button id="tokensMenuPlus">+</button></div>
                 </div>
-                <div id="erc20Selected">
-                    <p id="erc20Name"></p>
-                    <button id="erc20Change" class="button">change</button>
-                    <p id="erc20Balance"></p>
+                <div id="tokensSelected">
+                    <h3 id="tokensName"></h3>
+                    <p id="tokensBalance"></p>
                     <label>
                         <span>recipient address</span>
-                        <span id="erc20AddressHint" class="hint"></span>
-                        <input id="erc20Address" type="text" />
+                        <span id="tokensAddressHint" class="hint"></span>
+                        <input id="tokensAddress" class="address" type="text" />
                     </label>
                     <label>
-                        <span id="erc20ValueSpan"></span>
-                        <span id="erc20ValueHint" class="hint"></span>
-                        <input id="erc20Value" type="text" />
+                        <span id="tokensValueSpan"></span>
+                        <span id="tokensValueHint" class="hint"></span>
+                        <input id="tokensValue" type="text" />
                     </label>
-                    <button id="erc20Send" class="button">continue</button>
+                    <button id="tokensContinue" class="button">continue</button>
+                    <div id="tokensNewTxs" class="newTxs"></div>
+                </div>
+                <div id="tokensPlus">
+                    <h3>add token</h3>
+                    <label>
+                        <span>token contract</span>
+                        <span id="tokensContractHint" class="hint"></span>
+                        <input id="tokensContract" class="address" type="text" />
+                    </label>
+                    <button id="tokensAdd" class="button">add</button>
                 </div>
             </div>
             <div id="exglos">
+                <h3>exglos</h3>
                 <p id="exglosBalance">loading...</p>
                 <div class="row">
-                    <div><label>
-                        <span>eth value</span>
-                        <input id="exglosEth" type="text" />
-                        </label></div>
-                    <div><label>
-                        <span>exg value</span>
-                        <input id="exglosExg" type="text" />
-                        </label></div>
+                    <div>
+                        <label>
+                            <span>eth value</span>
+                            <input id="exglosEth" type="text" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <span>exg value</span>
+                            <input id="exglosExg" type="text" />
+                        </label>
+                    </div>
                 </div>
                 <p id="exglosError"></p>
                 <button id="exglosBuy" class="button">buy</button>
@@ -111,20 +121,43 @@
                     <button id="exglosWithdraw" class="button">withdraw</button>
                 </div>
                 <p id="exglosRef"></p>
+                <div id="exglosNewTxs" class="newTxs"></div>
             </div>
-            <div id="logs"></div>
+            <div id="plus">
+                <h3>other functions</h3>
+                <label>
+                    <span>contract address</span>
+                    <span id="plusAddressHint" class="hint"></span>
+                    <input id="plusAddress" class="address" type="text" />
+                </label>
+                <label>
+                    <span>function</span>
+                    <span id="plusFunctionHint" class="hint"></span>
+                    <input id="plusFunction" type="text" />
+                </label>
+                <div id="plusArgs"></div>
+                <button id="plusContinue" class="button">continue</button>
+                <div id="plusNewTxs" class="newTxs"></div>
+            </div>
         </div>
         <div id="tx">
             <h3 id="txDescription">tx</h3>
             <label>
                 <span>nonce</span>
-                <input id="txNonce" type="number" />
+                <input id="txNonce" type="text" />
+            </label>
+            <label>
+                <span>priority gas price, gwei</span>
+                <input id="txPriority" type="text" />
             </label>
             <label>
                 <span>max gas price, gwei</span>
-                <input id="txPrice" type="text" />
+                <input id="txMax" type="text" />
             </label>
-            <p id="txGas">loading gas...</p>
+            <label>
+                <span>gas limit</span>
+                <input id="txGas" type="text" />
+            </label>
             <p id="txBalance"></p>
             <p id="txError"></p>
             <div class="row">
@@ -132,7 +165,5 @@
                 <button id="txConfirm" class="button">confirm</button>
             </div>
         </div>
-        <div id="loading"><div></div></div>
-        <script src="index_1_2_3.js"></script>
     </body>
 </html>

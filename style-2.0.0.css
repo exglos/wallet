@@ -1,0 +1,352 @@
+:root {
+    --main-color: #ee0055;
+}
+@font-face {
+    font-family: main;
+    src: url(./font.ttf);
+}
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+div,
+input,
+button {
+    font-family: main, monospace;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+label {
+    display: block;
+    margin: 32px auto;
+    width: 90%;
+    max-width: 500px;
+    cursor: text;
+}
+label span {
+    display: block;
+    min-height: 18px;
+    text-align: center;
+    font-size: 14px;
+}
+.hint {
+    text-align: left;
+    color: var(--main-color);
+}
+label input {
+    display: block;
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid black;
+    padding: 4px 0;
+    background: none;
+    font-size: 16px;
+    outline: 0;
+}
+label input:focus {
+    border-color: var(--main-color);
+}
+.address {
+    font-size: 12px;
+}
+@media (min-width: 480px) {
+    .address {
+        font-size: 16px;
+    }
+}
+button {
+    background: transparent;
+    outline: 0;
+    cursor: pointer;
+}
+.button {
+    display: block;
+    margin: 0 auto 32px;
+    border: 2px solid black;
+    min-width: 80px;
+    padding: 8px;
+    font-size: 16px;
+}
+.button:focus {
+    border-color: var(--main-color);
+}
+a {
+    color: black;
+    text-decoration: none;
+    outline: 0;
+}
+a:focus {
+    color: var(--main-color);
+}
+@media (hover: hover) {
+    label input:hover,
+    .button:hover {
+        border-color: var(--main-color);
+    }
+    a:hover {
+        color: var(--main-color);
+    }
+}
+h3 {
+    margin: 16px;
+    text-align: center;
+    font-size: 18px;
+}
+
+/* loading */
+
+#loading {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fafafa;
+    opacity: 0.9;
+    cursor: wait;
+    animation: loading-background 1.2s forwards;
+}
+#loading div {
+    margin: auto;
+    margin-top: 30vh;
+    width: 160px;
+    height: 160px;
+    background: url(./logo.svg) center/contain no-repeat;
+    animation: loading-image 3s 1.9s infinite;
+}
+@keyframes loading-background {
+    0% {
+        opacity: 0.1;
+    }
+    100% {
+        opacity: 0.9;
+    }
+}
+@keyframes loading-image {
+    0% {
+        width: 160px;
+    }
+    80% {
+        width: 142px;
+    }
+    100% {
+        width: 160px;
+    }
+}
+
+/* start */
+
+#start h1 {
+    margin: 0 0 32px;
+    padding: 32px;
+    background: var(--main-color);
+    text-align: center;
+    font-size: 32px;
+    font-weight: normal;
+}
+#start h1 a:focus {
+    color: black;
+    text-decoration: underline;
+}
+#startCreate {
+    margin-top: 40px;
+    margin-bottom: 64px;
+}
+@media (hover: hover) {
+    #start h1 a:hover {
+        color: black;
+        text-decoration: underline;
+    }
+}
+
+/* create */
+
+#create {
+    display: none;
+    margin-top: 32px;
+}
+#create p {
+    text-align: center;
+}
+#createPassword {
+    margin: 32px 4px;
+    font-size: 16px;
+}
+
+/* main header */
+
+#main {
+    display: none;
+}
+#header {
+    background: var(--main-color);
+}
+#headerAccount {
+    margin: 10px 10px 10px 2px;
+    text-align: right;
+    font-weight: normal;
+}
+#headerBalance {
+    margin: 10px 10px 20px;
+    text-align: right;
+    font-size: 14px;
+}
+#headerMenu div {
+    float: left;
+}
+#headerMenu button {
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+}
+#header a:focus,
+#header button:focus,
+#header .active {
+    color: black;
+    text-decoration: underline;
+}
+@media (hover: hover) {
+    #header a:hover,
+    #header button:hover {
+        color: black;
+        text-decoration: underline;
+    }
+}
+
+/* main ether */
+
+#etherBalance {
+    text-align: center;
+}
+
+/* main tokens */
+
+#tokens {
+    display: none;
+}
+#tokensMenu {
+    background: var(--main-color);
+}
+#tokensMenu div {
+    float: left;
+}
+#tokensMenu button {
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+}
+#tokensMenu button:focus,
+#tokensMenu .active {
+    color: black;
+    text-decoration: underline;
+}
+@media (hover: hover) {
+    #tokensMenu button:hover {
+        color: black;
+        text-decoration: underline;
+    }
+}
+#tokensBalance {
+    text-align: center;
+}
+#tokensPlus {
+    display: none;
+}
+
+/* main exglos */
+
+#exglos {
+    display: none;
+}
+#exglosBalance {
+    text-align: center;
+}
+#exglos .row {
+    margin: 0 auto;
+    max-width: 800px;
+}
+@media (min-width: 600px) {
+    #exglos .row div {
+        float: left;
+        width: 50%;
+    }
+}
+#exglosError {
+    margin: 0 16px 16px;
+    min-height: 18px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--main-color);
+}
+#exglosDivs {
+    margin: 40px 16px 16px;
+    min-height: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+#exglosButtons {
+    display: none;
+    text-align: center;
+}
+#exglosButtons button {
+    display: inline;
+    margin: 0 16px;
+}
+#exglosRef {
+    margin: 32px 16px 0;
+    min-height: 18px;
+    text-align: center;
+}
+
+/* main plus */
+
+#plus {
+    display: none;
+}
+
+/* main new txs */
+
+.newTxs div {
+    margin: 32px auto;
+    width: 90%;
+    max-width: 500px;
+    border-bottom: 1px solid black;
+}
+.newTxs div p {
+    margin: 8px 0;
+    text-align: right;
+}
+
+/* tx */
+
+#tx {
+    display: none;
+    margin-bottom: 32px;
+}
+#tx h3 {
+    font-size: 16px;
+    font-weight: normal;
+}
+#txBalance {
+    margin: 16px auto;
+    width: 90%;
+    max-width: 500px;
+    min-height: 66px;
+    font-size: 16px;
+}
+#txError {
+    margin: 16px;
+    min-height: 18px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--main-color);
+}
+#tx .row {
+    text-align: center;
+}
+#tx .row button {
+    display: inline;
+    margin: 0 16px;
+}
