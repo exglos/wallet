@@ -848,22 +848,22 @@ Exglos.addTx = (div) => {
 const Plus = {};
 Plus.init = () => {
     const params = new URLSearchParams(window.location.search);
-    const address = params.get('plusAddress');
-    if (address) {
-        document.getElementById('plusAddress').value = address;
+    const contract = params.get('plusContract');
+    if (contract) {
+        document.getElementById('plusContract').value = contract;
     }
-    document.getElementById('plusAddress').addEventListener('keyup', (event) => {
+    document.getElementById('plusContract').addEventListener('keyup', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
             Plus.continue();
         } else if (event.key === 'Escape') {
             event.preventDefault();
-            document.getElementById('plusAddressHint').innerHTML = '';
-            document.getElementById('plusAddress').value = '';
+            document.getElementById('plusContractHint').innerHTML = '';
+            document.getElementById('plusContract').value = '';
         }
     });
-    document.getElementById('plusAddress').addEventListener('input', () => {
-        document.getElementById('plusAddressHint').innerHTML = '';
+    document.getElementById('plusContract').addEventListener('input', () => {
+        document.getElementById('plusContractHint').innerHTML = '';
     });
 
     const funct = params.get('plusFunction');
@@ -973,7 +973,7 @@ Plus.continue = () => {
     }
     Loading.show();
     setTimeout(async () => {
-        document.getElementById('plusAddressHint').innerHTML = '';
+        document.getElementById('plusContractHint').innerHTML = '';
         document.getElementById('plusFunctionHint').innerHTML = '';
         for (let i = 0; i < Plus.fragment.inputs.length; i++) {
             document.getElementById(`plus${i}Hint`).innerHTML = '';
@@ -982,16 +982,16 @@ Plus.continue = () => {
             document.getElementById('plusValueHint').innerHTML = '';
         }
 
-        let address;
+        let contract;
         try {
-            address = document.getElementById('plusAddress').value;
-            if (!address) {
+            contract = document.getElementById('plusContract').value;
+            if (!contract) {
                 throw new Error('enter address or ens');
             }
-            address = await ethers.resolveAddress(address, Wallet);
+            contract = await ethers.resolveAddress(contract, Wallet);
         } catch (error) {
-            document.getElementById('plusAddressHint').innerHTML = error.shortMessage || error.message || 'error';
-            document.getElementById('plusAddress').focus();
+            document.getElementById('plusContractHint').innerHTML = error.shortMessage || error.message || 'error';
+            document.getElementById('plusContract').focus();
             return Loading.hide();
         }
 
@@ -1023,6 +1023,12 @@ Plus.continue = () => {
         let data;
         try {
             data = new ethers.Interface([Plus.fragment]).encodeFunctionData(Plus.fragment.name, args);
+            while (Ether.balance === undefined) {
+                await new Promise((resolve) => setTimeout(resolve, 300));
+            }
+            if (Ether.balance === 0n) {
+                throw new Error('zero eth balance');
+            }
         } catch (error) {
             document.getElementById('plusFunctionHint').innerHTML = error.shortMessage || error.message || 'error';
             return Loading.hide();
@@ -1039,12 +1045,6 @@ Plus.continue = () => {
                 if (value < 0n) {
                     throw new Error('enter positive number');
                 }
-                while (Ether.balance === undefined) {
-                    await new Promise((resolve) => setTimeout(resolve, 300));
-                }
-                if (Ether.balance === 0n) {
-                    throw new Error('zero eth balance');
-                }
                 if (value > Ether.balance) {
                     throw new Error('too big value');
                 }
@@ -1055,16 +1055,15 @@ Plus.continue = () => {
             }
         }
 
-        window.data = data;
         Tx.description = `${Plus.fragment.name}(${args}) ${ethers.formatEther(value)} eth`;
-        Tx.request = { to: address, data: data, value: value };
+        Tx.request = { to: contract, data: data, value: value };
 
         Tx.show();
         Loading.hide();
     }, 0);
 };
 Plus.addTx = (div) => {
-    document.getElementById('plusAddress').value = '';
+    document.getElementById('plusContract').value = '';
     document.getElementById('plusFunction').value = '';
     document.getElementById('plusArgs').innerHTML = '';
     Plus.fragment = null;

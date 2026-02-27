@@ -48,21 +48,15 @@ Example:
 testv4KgEjnSfv0MbUYNUc7tXacm93d88e
 ```
 
----
-
 ### transfers
 
 The wallet enables the transfer of Ether, ERC-20 tokens, and other assets using an ERC-20 compatible transfer interface.
 
 ENS names can be used instead of Ethereum addresses throughout the wallet.
 
----
-
 ### exglos contract
 
 The wallet provides an interface to interact with the exglos contract, allowing users to purchase EXG tokens and manage dividends.
-
----
 
 ### plus
 
@@ -79,8 +73,6 @@ approve(address,uint)
 ```
 
 Note: number arguments are whole numbers, without decimals.
-
----
 
 ### tx parameters
 
