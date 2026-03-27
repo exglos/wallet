@@ -311,7 +311,7 @@ Ether.addTx = (div) => {
 };
 
 const Tokens = {
-    list: [{ address: '0x3dDee7CdF8D71490b518b1E6e6f2198433636903', name: 'Exglos', symbol: 'EXG', decimals: 18 }],
+    list: [{ contract: '0x3dDee7CdF8D71490b518b1E6e6f2198433636903', name: 'Exglos', symbol: 'EXG', decimals: 18 }],
     n: 0
 };
 Tokens.init = () => {
@@ -435,14 +435,14 @@ Tokens.add = () => {
         }
 
         for (let i = Tokens.list.length - 1; i >= 0; i--) {
-            if (Tokens.list[i].address === contract) {
+            if (Tokens.list[i].contract === contract) {
                 document.getElementById(`tokensMenu${i}`).click();
                 document.getElementById('tokensContract').value = '';
                 return Loading.hide();
             }
         }
 
-        const n = Tokens.list.push({ address: contract }) - 1;
+        const n = Tokens.list.push({ contract: contract }) - 1;
         const button = document.createElement('button');
         button.id = `tokensMenu${n}`;
         button.addEventListener('click', Tokens.select);
@@ -467,7 +467,7 @@ Tokens.loadParams = (n) => {
         'function name() view returns (string)',
         'function symbol() view returns (string)'
     ];
-    const contract = new ethers.Contract(token.address, abi, Wallet);
+    const contract = new ethers.Contract(token.contract, abi, Wallet);
     setTimeout(async () => {
         try {
             token.decimals = await contract.decimals();
@@ -499,8 +499,8 @@ Tokens.displayParams = () => {
     document.getElementById('tokensName').innerHTML = '';
     const a = document.createElement('a');
     a.target = '_blank';
-    a.href = Explorer.getAddressUrl(token.address);
-    a.innerHTML = token.name ? token.name : token.address;
+    a.href = Explorer.getAddressUrl(token.contract);
+    a.innerHTML = token.name ? token.name : token.contract;
     document.getElementById('tokensName').appendChild(a);
 
     let balance;
@@ -529,7 +529,7 @@ Tokens.updateBalance = async (n) => {
     const token = Tokens.list[n];
     try {
         const abi = ['function balanceOf(address) view returns (uint256)'];
-        const contract = new ethers.Contract(token.address, abi, Wallet);
+        const contract = new ethers.Contract(token.contract, abi, Wallet);
         const balance = await contract.balanceOf(Wallet);
         if (token.balance !== balance) {
             token.balance = balance;
@@ -602,7 +602,7 @@ Tokens.continue = () => {
             (enteredAddress.startsWith('0x') ? enteredAddress : `${enteredAddress} (${address})`);
         const abi = ['function transfer(address, uint256)'];
         const data = new ethers.Interface(abi).encodeFunctionData('transfer', [address, value]);
-        Tx.request = { to: token.address, data: data };
+        Tx.request = { to: token.contract, data: data };
 
         Tx.show();
         Loading.hide();
@@ -652,6 +652,7 @@ Exglos.init = () => {
     document.getElementById('exglosBuy').addEventListener('click', Exglos.buy);
     document.getElementById('exglosReinvest').addEventListener('click', Exglos.reinvest);
     document.getElementById('exglosWithdraw').addEventListener('click', Exglos.withdraw);
+    document.getElementById('exglosLoadTxs').addEventListener('click', Exglos.loadTxs);
 
     Tokens.startUpdateExglosBalance();
     setInterval(Exglos.updateDivs, 60000);
@@ -719,7 +720,7 @@ Exglos.setBalance = (balance) => {
 Exglos.updateDivs = async () => {
     try {
         const abi = ['function dividendsOf(address) view returns (uint256)'];
-        const contract = new ethers.Contract(Tokens.list[0].address, abi, Wallet);
+        const contract = new ethers.Contract(Tokens.list[0].contract, abi, Wallet);
         const divs = await contract.dividendsOf(Wallet);
         if (Exglos.divs !== divs) {
             Exglos.divs = divs;
@@ -843,6 +844,72 @@ Exglos.addTx = (div) => {
 
     const container = document.getElementById('exglosNewTxs');
     container.insertBefore(div, container.firstChild);
+};
+
+Exglos.loadTxs = async () => {
+    try {
+        document.getElementById('exglosLoadTxs').disabled = true;
+
+        let result = await Data.getTransactions(Wallet.address, Exglos.cursor);
+        if (!result.ok) {
+            throw new Error(result.status);
+        }
+        result = await result.json();
+
+        const exgAddress = Tokens.list[0].contract.toLowerCase();
+        const container = document.getElementById('exglosAllTxs');
+        let n = 0;
+        for (const tx of result.result) {
+            if (tx.receipt_status !== '1' || tx.to_address !== exgAddress) {
+                continue;
+            }
+            const div = document.createElement('div');
+            div.className = 'allTxs';
+            const a = document.createElement('a');
+            a.target = '_blank';
+            a.href = Explorer.getTxUrl(tx.hash);
+            div.appendChild(a);
+            const pMinus = document.createElement('p');
+            div.appendChild(pMinus);
+            const pPlus = document.createElement('p');
+            div.appendChild(pPlus);
+            if (tx.decoded_call.label === 'buy') {
+                a.innerHTML = `buy`;
+                pMinus.innerHTML = `- ${ethers.formatEther(tx.value)} eth`;
+                pPlus.innerHTML = `+ ${ethers.formatEther(tx.logs[1].decoded_event.params[2].value)} exg`;
+            } else if (tx.decoded_call.label === 'reinvest') {
+                a.innerHTML = `reinvest`;
+                pMinus.innerHTML = `- ${ethers.formatEther(tx.internal_transactions[0].value)} eth divs`;
+                pPlus.innerHTML = `+ ${ethers.formatEther(tx.logs[1].decoded_event.params[2].value)} exg`;
+            } else if (tx.decoded_call.label === 'withdraw') {
+                a.innerHTML = `withdraw`;
+                pMinus.innerHTML = `- ${ethers.formatEther(tx.internal_transactions[0].value)} eth divs`;
+                pPlus.innerHTML = `+ ${ethers.formatEther(tx.internal_transactions[0].value)} eth`;
+            } else {
+                continue;
+            }
+            container.appendChild(div);
+            n++;
+        }
+
+        Exglos.cursor = result.cursor;
+        Exglos.loadedTxs = (Exglos.loadedTxs || 0) + n;
+        if (!Exglos.cursor) {
+            document.getElementById('exglosLoadTxs').style.display = 'none';
+            if (!Exglos.loadedTxs) {
+                const p = document.createElement('p');
+                p.className = 'allTxsEmpty';
+                p.innerHTML = 'no txs';
+                container.appendChild(p);
+            }
+        } else {
+            document.getElementById('exglosLoadTxs').disabled = false;
+            document.getElementById('exglosLoadTxs').innerHTML = 'more';
+        }
+    } catch (error) {
+        document.getElementById('exglosLoadTxs').disabled = false;
+        console.error(error);
+    }
 };
 
 const Plus = {};
@@ -1346,6 +1413,21 @@ Tx.createNewTxDiv = (description, hash, nonce) => {
     }, 10000);
 
     return div;
+};
+
+const Data = {};
+Data.getHeaders = () => ({
+    'X-API-Key':
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjZhNmI4ZjcxLWVmMTUtNDcxYy04MmNi' +
+        'LTBlODU0Y2RiMDAwMSIsIm9yZ0lkIjoiNTA0MzMxIiwidXNlcklkIjoiNTE4OTM2IiwidHlwZSI6IlBST' +
+        '0pFQ1QiLCJ0eXBlSWQiOiIxYjAyMTVlZi1jOWIzLTQ3NjYtYTZkNy04ZGQxZjRkMGFlNGUiLCJpYXQiOj' +
+        'E3NzI4ODY1MzksImV4cCI6NDkyODY0NjUzOX0.vX5hzQW6i4Vw2pdAsvar-G_mQAYLRsPVnhUUv3-tG_A'
+});
+Data.getTransactions = (address, cursor, limit) => {
+    const url =
+        `https://deep-index.moralis.io/api/v2.2/${address}/verbose?chain=eth&` +
+        `from_block=14856308&include=internal_transactions&limit=${limit || 100}&cursor=${cursor || null}`;
+    return fetch(url, { headers: Data.getHeaders() });
 };
 
 const Explorer = {

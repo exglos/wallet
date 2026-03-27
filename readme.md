@@ -115,8 +115,9 @@ Example: [wallet.exglos.com?tokenContract=0xC02aaA39b223FE8D0A0e5C4F27eAD9083C75
 
 ### interaction with exglos smart contract
 - `exglosValue`: the value to buy, specified in Ether.
+- `ref`: inviter's address for rewards.
 
-Example: [wallet.exglos.com?exglosValue=0.001](https://wallet.exglos.com?exglosValue=0.001)
+Example: [wallet.exglos.com?exglosValue=0.001&ref=jo.exglos.eth](https://wallet.exglos.com?exglosValue=0.001&ref=jo.exglos.eth)
 
 ### other functions
 - `plusContract`: the contract address to interact with.
@@ -131,8 +132,11 @@ Example withdrawing 0.001 WETH:
 
 ## changelog
 
+version 2.1.0:
+- Added exglos transactions history
+
 version 2.0.0:
-- Refactored using ES11 syntax for improved maintainability.
+- Refactored using ES11 syntax for improved maintainability and readability.
 - Introduced exglos wallet plus for direct smart contract interaction via ABI.
 - Added options for optimizing gas limits and prices.
 

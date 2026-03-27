@@ -319,6 +319,22 @@ h3 {
     text-align: right;
 }
 
+/* main all txs */
+
+.allTxsEmpty {
+    padding: 32px;
+    text-align: center;
+}
+.allTxs div {
+    margin: 32px auto;
+    width: 90%;
+    max-width: 500px;
+    border-bottom: 1px solid black;
+}
+.allTxs p {
+    margin: 2px 0;
+}
+
 /* tx */
 
 #tx {
