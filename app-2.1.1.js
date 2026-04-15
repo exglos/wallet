@@ -770,7 +770,7 @@ Exglos.buy = () => {
         Tx.description = `buy ${document.getElementById('exglosExg').value} exg for ${ethers.formatEther(value)} eth`;
         const abi = ['function buy(address) payable'];
         const data = new ethers.Interface(abi).encodeFunctionData('buy', [ref]);
-        Tx.request = { to: Tokens.list[0].address, data: data, value: value };
+        Tx.request = { to: Tokens.list[0].contract, data: data, value: value };
 
         Tx.show();
         Loading.hide();
@@ -801,7 +801,7 @@ Exglos.reinvest = () => {
         Tx.description = `reinvest ${ethers.formatEther(Exglos.divs)} eth`;
         const abi = ['function reinvest()'];
         const data = new ethers.Interface(abi).encodeFunctionData('reinvest');
-        Tx.request = { to: Tokens.list[0].address, data: data };
+        Tx.request = { to: Tokens.list[0].contract, data: data };
 
         Tx.show();
         Loading.hide();
@@ -832,7 +832,7 @@ Exglos.withdraw = () => {
         Tx.description = `withdraw ${ethers.formatEther(Exglos.divs)} eth`;
         const abi = ['function withdraw()'];
         const data = new ethers.Interface(abi).encodeFunctionData('withdraw');
-        Tx.request = { to: Tokens.list[0].address, data: data };
+        Tx.request = { to: Tokens.list[0].contract, data: data };
 
         Tx.show();
         Loading.hide();
