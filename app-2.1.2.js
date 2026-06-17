@@ -45,9 +45,13 @@ Password.getWallet = (password) => {
         password = ethers.HDNodeWallet.fromPhrase(password, null, path).privateKey;
     }
 
-    const provider = ethers.getDefaultProvider(null, {
-        alchemy: 'm6nHD1aQAIbJHAYLnIMoBzMLOep-bLyC',
-        infura: '-'
+    const provider = new ethers.FallbackProvider([
+        new ethers.EtherscanProvider(null, '46JWJWIVWGMR5J3IHXJ55V6WEFTBH3DBXG'),
+        new ethers.ChainstackProvider(null, '37251a6c4d868b06af864b7eda04d94d'),
+        new ethers.AlchemyProvider(null, 'BZ60gxmr-PPt9S-mjDUdR')
+    ], null, {
+        pollingInterval: 9000,
+        quorum: 1
     });
     Wallet = new ethers.Wallet(password, provider);
     password = null;
